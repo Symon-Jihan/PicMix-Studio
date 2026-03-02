@@ -19,3 +19,6 @@ Online photo mixing/editing web app.
 2. Open `index.html` in your browser.
 3. (Optional) Use a local server (e.g. VS Code Live Server) for best results.
 
+## Forking
+- Forking is welcome—please feel free to fork and customize.
+
