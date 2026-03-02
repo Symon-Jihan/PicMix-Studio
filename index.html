@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PicMix Studio</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="logo" aria-label="PicMix Studio">
+      <span class="logo-word">PicMix</span>
+      <span class="logo-studio">Studio</span>
+      <span class="logo-glow" aria-hidden="true"></span>
+    </div>
+    <nav class="tabs" aria-label="Studio tabs">
+      <button class="tab active" data-tab="editor" aria-controls="tab-editor">Editor Lab</button>
+      <button class="tab" data-tab="collage" aria-controls="tab-collage">Collage Studio</button>
+      <button class="tab" data-tab="tone" aria-controls="tab-tone">Tone Fusion</button>
+    </nav>
+    <div class="header-hint">No Logins Required</div>
+  </header>
+
+  <main class="stage" id="stage">
+  <!-- EDITOR TAB -->
+  <section id="tab-editor" class="tab-content active" role="tabpanel">
+    <div class="drop-zone" id="editorDrop">
+      <div class="drop-inner">
+        <svg viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="23" stroke="currentColor" stroke-width="1.5"/><path d="M24 14v14M17 21l7-7 7 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 34h20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <p>Drop a photo here</p>
+        <span>or <label for="editorInput" class="link">browse files</label></span>
+        <input type="file" id="editorInput" accept="image/*" hidden />
+      </div>
+    </div>
+
+    <div class="editor-workspace" id="editorWorkspace" style="display:none">
+      <div class="canvas-wrap">
+        <div class="load-sheen" id="editorLoading" aria-hidden="true">
+          <div class="spinner" aria-hidden="true"></div>
+          <div class="load-text">Loading image…</div>
+        </div>
+        <canvas id="editorCanvas"></canvas>
+        <div id="vignetteOverlay" class="vignette-layer"></div>
+      </div>
+      <aside class="controls-panel">
+        <div class="panel-title">Adjustments</div>
+        <div class="control-group"><label>Brightness <span id="valBrightness">100</span>%</label><input type="range" id="ctrlBrightness" min="0" max="200" value="100" /></div>
+        <div class="control-group"><label>Contrast <span id="valContrast">100</span>%</label><input type="range" id="ctrlContrast" min="0" max="200" value="100" /></div>
+        <div class="control-group"><label>Saturation <span id="valSaturation">100</span>%</label><input type="range" id="ctrlSaturation" min="0" max="200" value="100" /></div>
+        <div class="control-group"><label>Hue Rotate <span id="valHue">0</span>°</label><input type="range" id="ctrlHue" min="0" max="360" value="0" /></div>
+        <div class="control-group">
+          <label><span id="lblBlurMode">Blur</span> <span id="valBlur">0</span>px</label>
+          <input type="range" id="ctrlBlur" min="0" max="20" value="0" step="0.5" />
+        </div>
+        <div class="control-group">
+          <label>Local Blur Brush <span id="valLocalBlur">Off</span></label>
+          <label class="switch" style="margin-top:6px">
+            <input type="checkbox" id="ctrlLocalBlur" />
+            <span class="switch-ui" aria-hidden="true"></span>
+          </label>
+          <div style="height:8px"></div>
+          <label>Brush Size <span id="valBlurBrushSize">64</span>px</label>
+          <input type="range" id="ctrlBlurBrushSize" min="10" max="180" value="64" />
+          <div style="height:10px"></div>
+          <label>Brush Strength <span id="valBlurBrushStrength">70</span>%</label>
+          <input type="range" id="ctrlBlurBrushStrength" min="10" max="100" value="70" />
+          <div style="height:10px"></div>
+          <button id="clearLocalBlurBtn" class="btn-secondary" type="button">Clear Local Blur</button>
+        </div>
+        <div class="control-group"><label>Opacity <span id="valOpacity">100</span>%</label><input type="range" id="ctrlOpacity" min="0" max="100" value="100" /></div>
+        <div class="control-group"><label>Sepia <span id="valSepia">0</span>%</label><input type="range" id="ctrlSepia" min="0" max="100" value="0" /></div>
+        <div class="control-group"><label>Grayscale <span id="valGrayscale">0</span>%</label><input type="range" id="ctrlGrayscale" min="0" max="100" value="0" /></div>
+        <div class="control-group"><label>Invert <span id="valInvert">0</span>%</label><input type="range" id="ctrlInvert" min="0" max="100" value="0" /></div>
+        <div class="control-group"><label>Vignette <span id="valVignette">0</span>%</label><input type="range" id="ctrlVignette" min="0" max="100" value="0" /></div>
+
+        <div class="panel-title" style="margin-top:20px">Presets</div>
+        <div class="presets">
+          <button class="preset-btn" data-preset="vivid">Vivid</button>
+          <button class="preset-btn" data-preset="matte">Matte</button>
+          <button class="preset-btn" data-preset="noir">Noir</button>
+          <button class="preset-btn" data-preset="warm">Warm</button>
+          <button class="preset-btn" data-preset="cool">Cool</button>
+          <button class="preset-btn" data-preset="faded">Faded</button>
+          <button class="preset-btn" data-preset="chrome">Chrome</button>
+          <button class="preset-btn" data-preset="vintage">Vintage</button>
+        </div>
+
+        <div class="action-btns">
+          <button id="resetBtn" class="btn-secondary">Reset</button>
+          <button id="downloadBtn" class="btn-primary">Download</button>
+          <button id="newPhotoBtn" class="btn-ghost">New Photo</button>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- COLLAGE TAB -->
+  <section id="tab-collage" class="tab-content" role="tabpanel">
+    <div class="collage-setup" id="collageSetup">
+      <div class="drop-zone wide" id="collageDrop">
+        <div class="drop-inner">
+          <svg viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="23" stroke="currentColor" stroke-width="1.5"/><rect x="13" y="15" width="9" height="9" rx="1.5" stroke="currentColor" stroke-width="1.5"/><rect x="26" y="15" width="9" height="9" rx="1.5" stroke="currentColor" stroke-width="1.5"/><rect x="13" y="28" width="9" height="7" rx="1.5" stroke="currentColor" stroke-width="1.5"/><rect x="26" y="28" width="9" height="7" rx="1.5" stroke="currentColor" stroke-width="1.5"/></svg>
+          <p>Drop multiple photos</p>
+          <span>or <label for="collageInput" class="link">browse files</label> • drag thumbnails to reorder</span>
+          <input type="file" id="collageInput" accept="image/*" multiple hidden />
+        </div>
+      </div>
+      <div class="collage-thumbnails" id="collageThumbs" style="display:none"></div>
+      <div class="collage-options" id="collageOptions" style="display:none">
+        <div class="option-row">
+          <span class="option-label">Aspect</span>
+          <div class="pill-row" role="group" aria-label="Aspect ratio">
+            <button class="pill-btn active" data-aspect="1:1">1:1</button>
+            <button class="pill-btn" data-aspect="4:5">4:5</button>
+            <button class="pill-btn" data-aspect="9:16">9:16</button>
+          </div>
+        </div>
+        <div class="option-row">
+          <span class="option-label">Layout</span>
+          <div class="layout-btns">
+            <button class="layout-btn active" data-layout="grid">Grid</button>
+            <button class="layout-btn" data-layout="mosaic">Mosaic</button>
+            <button class="layout-btn" data-layout="horizontal">Strips</button>
+            <button class="layout-btn" data-layout="diagonal">Diagonal</button>
+            <button class="layout-btn" data-layout="polaroid">Polaroid</button>
+          </div>
+        </div>
+        <div class="option-row">
+          <span class="option-label">Background</span>
+          <div class="pill-row" role="group" aria-label="Background mode">
+            <button class="pill-btn active" data-bgmode="solid">Solid</button>
+            <button class="pill-btn" data-bgmode="gradient">Gradient</button>
+          </div>
+        </div>
+        <div class="option-row" id="collageBgSolidRow">
+          <span class="option-label">Solid</span>
+          <div class="bg-btns" aria-label="Solid background colors">
+            <button class="bg-btn active" data-bg="#0d0d0d" style="background:#0d0d0d"></button>
+            <button class="bg-btn" data-bg="#f5f0eb" style="background:#f5f0eb"></button>
+            <button class="bg-btn" data-bg="#ffffff" style="background:#ffffff"></button>
+            <button class="bg-btn" data-bg="#1a1a2e" style="background:#1a1a2e"></button>
+            <button class="bg-btn" data-bg="#2d1b69" style="background:#2d1b69"></button>
+          </div>
+        </div>
+        <div class="option-row" id="collageBgGradientRow" style="display:none">
+          <span class="option-label">Gradient</span>
+          <div class="gradient-controls">
+            <input type="color" id="collageGradA" value="#070A12" aria-label="Gradient color A" />
+            <input type="color" id="collageGradB" value="#2D1B69" aria-label="Gradient color B" />
+            <select id="collageGradAngle" aria-label="Gradient angle">
+              <option value="0">0°</option>
+              <option value="45" selected>45°</option>
+              <option value="90">90°</option>
+              <option value="135">135°</option>
+            </select>
+          </div>
+        </div>
+        <div class="option-row">
+          <span class="option-label">Gap</span>
+          <input type="range" id="collageGap" min="0" max="30" value="8" />
+          <span class="val-label" id="valGap">8</span>px
+        </div>
+        <div class="option-row">
+          <span class="option-label">Padding</span>
+          <input type="range" id="collagePad" min="0" max="60" value="16" />
+          <span class="val-label" id="valPad">16</span>px
+        </div>
+        <div class="option-row">
+          <span class="option-label">Round</span>
+          <input type="range" id="collageRound" min="0" max="40" value="10" />
+          <span class="val-label" id="valRound">10</span>px
+        </div>
+        <div class="option-row">
+          <span class="option-label">Shadow</span>
+          <label class="switch">
+            <input type="checkbox" id="collageShadow" checked />
+            <span class="switch-ui" aria-hidden="true"></span>
+          </label>
+        </div>
+        <div class="option-row">
+          <span class="option-label">Frame</span>
+          <div class="pill-row" role="group" aria-label="Frame style">
+            <button class="pill-btn active" data-frame="minimal">Minimal</button>
+            <button class="pill-btn" data-frame="neon">Neon</button>
+            <button class="pill-btn" data-frame="film">Film strip</button>
+            <button class="pill-btn" data-frame="torn">Torn paper</button>
+          </div>
+        </div>
+        <div class="option-row">
+          <span class="option-label">Text</span>
+          <input type="text" id="collageText" class="text-input" placeholder="Add a caption…" maxlength="60" />
+        </div>
+        <div class="option-row">
+          <span class="option-label">Size</span>
+          <input type="range" id="collageTextSize" min="12" max="96" value="40" />
+          <span class="val-label" id="valTextSize">40</span>px
+        </div>
+        <div class="option-row">
+          <span class="option-label">Color</span>
+          <div class="text-style-row">
+            <input type="color" id="collageTextColor" value="#ffffff" aria-label="Text color" />
+            <span class="mini-label">Opacity</span>
+            <input type="range" id="collageTextOpacity" min="0" max="100" value="85" />
+            <span class="val-label" id="valTextOpacity">85</span>%
+          </div>
+        </div>
+        <div class="option-row">
+          <span class="option-label">Export</span>
+          <span class="mini-label">JPEG</span>
+          <input type="range" id="collageQuality" min="80" max="100" value="95" />
+          <span class="val-label" id="valQuality">95</span>%
+        </div>
+        <div class="action-btns" style="margin-top:16px">
+          <button id="buildCollageBtn" class="btn-primary">Build Collage</button>
+          <button id="clearCollageBtn" class="btn-ghost">Clear All</button>
+        </div>
+      </div>
+    </div>
+    <div class="collage-result" id="collageResult" style="display:none">
+      <div class="canvas-wrap collage-canvas-wrap">
+        <canvas id="collageCanvas"></canvas>
+        <div class="drag-overlay" id="collageTextDrag" style="display:none" aria-hidden="true">Drag text</div>
+      </div>
+      <div class="collage-actions">
+        <button id="collageDownloadBtn" class="btn-primary">Download Collage</button>
+        <button id="collageBackBtn" class="btn-ghost">← Back to Edit</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- TONE FUSION TAB -->
+  <section id="tab-tone" class="tab-content" role="tabpanel">
+    <div class="tone-grid">
+      <div class="panel glass">
+        <div class="panel-head">
+          <div class="panel-title">Base Image</div>
+          <div class="panel-sub">The photo you want to transform</div>
+        </div>
+        <div class="drop-zone compact" id="toneBaseDrop">
+          <div class="drop-inner">
+            <p>Upload Base Image</p>
+            <span>or <label for="toneBaseInput" class="link">browse files</label></span>
+            <input type="file" id="toneBaseInput" accept="image/*" hidden />
+          </div>
+        </div>
+      </div>
+
+      <div class="panel glass">
+        <div class="panel-head">
+          <div class="panel-title">Style Image</div>
+          <div class="panel-sub">We’ll extract a color mood palette</div>
+        </div>
+        <div class="drop-zone compact" id="toneStyleDrop">
+          <div class="drop-inner">
+            <p>Upload Style Image</p>
+            <span>or <label for="toneStyleInput" class="link">browse files</label></span>
+            <input type="file" id="toneStyleInput" accept="image/*" hidden />
+          </div>
+        </div>
+        <div class="palette-row" id="tonePalette" style="display:none" aria-label="Extracted palette"></div>
+      </div>
+    </div>
+
+    <div class="tone-workspace" id="toneWorkspace" style="display:none">
+      <div class="canvas-wrap">
+        <div class="load-sheen" id="toneLoading" aria-hidden="true">
+          <div class="spinner" aria-hidden="true"></div>
+          <div class="load-text">Fusing tones…</div>
+        </div>
+        <canvas id="toneCanvas"></canvas>
+      </div>
+      <aside class="controls-panel">
+        <div class="panel-title">Fusion Controls</div>
+        <div class="control-group">
+          <label>Blend Intensity <span id="valToneIntensity">65</span>%</label>
+          <input type="range" id="toneIntensity" min="0" max="100" value="65" />
+        </div>
+        <div class="action-btns" style="margin-top:12px">
+          <button id="toneDownloadBtn" class="btn-primary">Download</button>
+          <button id="toneResetBtn" class="btn-ghost">Reset</button>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
